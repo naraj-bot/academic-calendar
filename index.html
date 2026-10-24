@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ปฏิทินการศึกษา | ระบบปฏิทินการศึกษาและแผนปฏิบัติงาน</title>
+<meta name="description" content="ระบบปฏิทินการศึกษา ตารางวันเรียน Day 1–200 และแผนปฏิบัติงาน 4 ฝ่าย · พัฒนาโดย ครูซอสสอนสังคม 2569">
+<meta name="author" content="ครูซอสสอนสังคม">
+<meta name="theme-color" content="#5c0b17">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/logo.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app" id="app">
+  <aside class="rail" aria-label="เมนูหลัก">
+    <div class="brand"><span id="brandLogo"><span class="seal"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M9 14.5l2 2 4-4"/></svg></span></span>
+      <div><b id="brandName">ระบบปฏิทินการศึกษา</b><small id="brandSchool">โรงเรียนของเรา</small></div></div>
+    <div id="railNav"></div>
+    <div class="railfoot"><b id="footSchool">โรงเรียนของเรา</b><span id="footYear">ปีการศึกษา 2569</span><div class="credit">พัฒนาโดย <b>ครูซอสสอนสังคม</b> 2569</div></div>
+  </aside>
+  <div class="work">
+    <header class="topbar">
+      <div class="grow"><h1 id="pageTitle">ภาพรวม</h1><div class="sub" id="pageSub"></div></div>
+      <span class="chipdate num" id="todayChip"></span>
+      <select class="yearsel num" id="yearSel" data-change="year" aria-label="ปีการศึกษา"></select>
+      <button class="me" id="meChip" data-act="viewas"><span class="av" id="meAv">?</span><span><span id="meName">กำลังตรวจสิทธิ์</span><small id="meRole">—</small></span></button>
+    </header>
+    <main class="content" id="view"><div class="loading">กำลังโหลดปฏิทิน…</div></main>
+  </div>
+</div>
+<nav class="bottombar" id="bottomNav" aria-label="เมนูหลัก"></nav>
+<div id="modalRoot"></div>
+<div id="pvRoot"></div>
+<div class="gate" id="gate"><div class="loading">กำลังตรวจสอบบัญชี…</div></div>
+<div class="toast" id="toast" hidden></div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

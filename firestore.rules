@@ -1,0 +1,70 @@
+rules_version = '2';
+
+// กฎความปลอดภัยของระบบปฏิทินการศึกษา
+// แอดมินหลัก (main) · แอดมินโรงเรียน (school) · ครู/บุคลากร (teacher)
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function userDoc() { return /databases/$(database)/documents/users/$(request.auth.uid); }
+    function active() { return signedIn() && exists(userDoc()) && get(userDoc()).data.active == true; }
+    function role() { return get(userDoc()).data.role; }
+    function isMain() { return active() && role() == 'main'; }
+    function isEditor() { return active() && (role() == 'main' || role() == 'school'); }
+
+    // ตั้งค่าครั้งแรก: อนุญาตเฉพาะตอนที่ยังไม่มีแอดมินหลัก และต้องสร้างเอกสาร bootstrap ในชุดเดียวกัน
+    function bootstrapPath() { return /databases/$(database)/documents/config/bootstrap; }
+    function bootstrapping() { return signedIn() && !exists(bootstrapPath()) && existsAfter(bootstrapPath()); }
+
+    // ข้อมูลที่หน้าเข้าสู่ระบบต้องใช้ (ชื่อโรงเรียน ปีการศึกษา โลโก้) อ่านได้โดยไม่ต้องเข้าสู่ระบบ
+    match /config/bootstrap {
+      allow read: if true;
+      allow create: if signedIn() && !exists(bootstrapPath());
+      allow update, delete: if false;
+    }
+    match /config/system {
+      allow read: if true;
+      allow write: if isMain() || bootstrapping();
+    }
+    match /config/school {
+      allow read: if true;
+      allow write: if isEditor() || bootstrapping();
+    }
+    match /years/{year} {
+      allow read: if true;
+      allow write: if isEditor() || bootstrapping();
+    }
+
+    // ผู้ใช้
+    match /users/{uid} {
+      allow read: if active() || (signedIn() && request.auth.uid == uid);
+      allow create: if isMain()
+        || (bootstrapping() && request.auth.uid == uid && request.resource.data.role == 'main');
+      // แอดมินหลักแก้ได้ทุกคน (แต่เปลี่ยนบทบาท/ปิดบัญชีตัวเองไม่ได้) · ผู้ใช้ทั่วไปแก้ได้เฉพาะเวลาเข้าใช้ล่าสุดของตัวเอง
+      allow update: if (isMain() && (uid != request.auth.uid
+                          || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'active'])))
+        || (active() && uid == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastLogin', 'displayName']));
+      allow delete: if isMain() && uid != request.auth.uid;
+    }
+
+    // วันหยุด / แผนงาน
+    match /holidays/{id} {
+      allow read: if active();
+      allow create, update: if isEditor();
+      allow delete: if isMain();
+    }
+    match /plans/{id} {
+      allow read: if active();
+      allow create, update: if isEditor();
+      allow delete: if isMain();
+    }
+
+    // ประวัติการแก้ไข: เพิ่มได้อย่างเดียว ห้ามแก้ห้ามลบ
+    match /audit/{id} {
+      allow read: if active();
+      allow create: if active() && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+  }
+}
