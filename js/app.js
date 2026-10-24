@@ -65,31 +65,38 @@ const I={
  chevl:'<path d="M15 6l-6 6 6 6"/>', chevr:'<path d="M9 6l6 6-6 6"/>',
  trashbin:'<path d="M4 7h16M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/>',
  eye:'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/>',
+ book:'<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/>',
  copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>'
 };
 const ic=(n,cls="i")=>`<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${I[n]||""}</svg>`;
 const ROUTES=[
  {id:"home",label:"ภาพรวม",icon:"home",group:"ปฏิทินการศึกษา",sub:"สถานะวันเรียนและกำหนดการที่กำลังจะถึง"},
- {id:"days",label:"ตารางวันเรียน Day 1–200",short:"200 วัน",icon:"grid",group:"ปฏิทินการศึกษา",sub:"ลำดับวันทำการเรียนสะสมตลอดปีการศึกษา"},
+ {id:"days",label:"ตารางวันเรียน Day 1–200",nav:"ตาราง Day 1–200",short:"200 วัน",icon:"grid",group:"ปฏิทินการศึกษา",sub:"ลำดับวันทำการเรียนสะสมตลอดปีการศึกษา"},
  {id:"term1",label:"ปฏิทินภาคเรียนที่ 1",short:"ภาค 1",icon:"cal",group:"ปฏิทินการศึกษา",sub:"ปฏิทินการจัดการเวลาเรียนรายเดือน"},
  {id:"term2",label:"ปฏิทินภาคเรียนที่ 2",short:"ภาค 2",icon:"cal",group:"ปฏิทินการศึกษา",sub:"ปฏิทินการจัดการเวลาเรียนรายเดือน"},
  {id:"ops",label:"แผนปฏิบัติงาน 4 ฝ่าย",short:"4 ฝ่าย",icon:"ops",group:"ปฏิทินการศึกษา",sub:"วิชาการ · ทั่วไป · บุคคล · งบประมาณ"},
- {id:"holidays",label:"วันหยุด / วันเรียนชดเชย",icon:"hol",group:"จัดการข้อมูล",sub:"ค้นหา เพิ่ม แก้ไขวันหยุดและวันชดเชย"},
- {id:"plans",label:"รายการแผนงาน 4 ฝ่าย",icon:"list",group:"จัดการข้อมูล",sub:"ค้นหา เพิ่ม แก้ไขงานของแต่ละฝ่าย"},
+ {id:"holidays",label:"วันหยุด / วันเรียนชดเชย",nav:"วันหยุด / วันชดเชย",icon:"hol",group:"จัดการข้อมูล",sub:"ค้นหา เพิ่ม แก้ไขวันหยุดและวันชดเชย"},
+ {id:"plans",label:"รายการแผนงาน 4 ฝ่าย",nav:"รายการแผนงาน",icon:"list",group:"จัดการข้อมูล",sub:"ค้นหา เพิ่ม แก้ไขงานของแต่ละฝ่าย"},
  {id:"trash",label:"ถังขยะ",icon:"trashbin",group:"จัดการข้อมูล",sub:"รายการที่ถูกลบ กู้คืนได้"},
  {id:"people",label:"ผู้ใช้งานและประวัติ",icon:"users",group:"ผู้ดูแลระบบ",sub:"จัดการผู้ใช้ บทบาท และประวัติการแก้ไข",min:"school"},
- {id:"setup",label:"ตั้งค่า / ปีการศึกษา",icon:"gear",group:"ผู้ดูแลระบบ",sub:"ข้อมูลโรงเรียน ภาคเรียน และปีการศึกษา",min:"school"}
+ {id:"setup",label:"ตั้งค่า / ปีการศึกษา",nav:"ตั้งค่าระบบ",icon:"gear",group:"ผู้ดูแลระบบ",sub:"ข้อมูลโรงเรียน ภาคเรียน และปีการศึกษา",min:"school"},
+ {id:"guide",label:"คู่มือการใช้งาน",icon:"book",group:"ช่วยเหลือ",sub:"วิธีใช้ระบบสำหรับทุกบทบาท"}
 ];
 
 /* ================= state ================= */
 const S={users:[],bootstrapped:false,bootChecked:false,authChecked:false,settingUp:false,loginErr:"",connErr:false,gateMode:"",sysDoc:{},schoolDoc:{},yearsDocs:{},holidays:[],plans:[],audit:[],loaded:{sys:false,school:false,years:false,h:false,p:false},
-  db:null,user:null,downloads:null,dbChecked:false,realRole:"teacher",viewAs:null,uid:null,me:null,route:"home",
+  db:null,user:null,downloads:null,dbChecked:false,realRole:"teacher",myRoles:["teacher"],activeRole:null,uid:null,me:null,route:"home",
   viewYear:null,yearPinned:false,opsTerm:null,hSearch:"",pSearch:"",names:{},cfg:null,setupDirty:false};
 let prefs={opsDivs:Object.keys(DIVS),pDivs:Object.keys(DIVS),hTypes:Object.keys(HTYPES),uRoles:["main","school","teacher"]};
 try{const p=JSON.parse(localStorage.getItem("acal2")||"null");if(p)prefs={...prefs,...p};}catch(e){}
 try{const y=+localStorage.getItem("acal-year");if(y>2500){S.viewYear=y;S.yearPinned=true;}}catch(e){}
 function savePrefs(){try{localStorage.setItem("acal2",JSON.stringify(prefs));}catch(e){}}
-const role=()=>S.viewAs||S.realRole;
+const role=()=>S.activeRole||S.realRole;
+const rolesOf=u=>{const r=(u&&Array.isArray(u.roles)&&u.roles.length?u.roles:[u&&u.role||"teacher"]).filter(k=>ROLE_LABEL[k]);return r.length?[...new Set(r)]:["teacher"];};
+const topRole=rs=>rs.reduce((a,b)=>RANK[b]>RANK[a]?b:a,"teacher");
+function applyRoles(d){S.myRoles=rolesOf(d);S.realRole=topRole(S.myRoles);let saved=null;try{saved=localStorage.getItem("acal-role-"+S.uid);}catch(e){}
+  S.activeRole=saved&&S.myRoles.includes(saved)&&saved!==S.realRole?saved:null;}
+function setActiveRole(r){if(!S.myRoles.includes(r))return;S.activeRole=r===S.realRole?null:r;try{localStorage.setItem("acal-role-"+S.uid,r);}catch(e){}}
 const canWrite=()=>RANK[role()]>=1&&!!S.db;
 const isMain=()=>role()==="main"&&!!S.db;
 try{const h=(location.hash||"").slice(1);if(ROUTES.some(r=>r.id===h))S.route=h;}catch(e){}
@@ -168,7 +175,7 @@ function renderNav(){
   const ct="term"+curTerm();let html="",g="";
   for(const r of ROUTES){if(r.min&&RANK[role()]<RANK[r.min])continue;
     if(r.group!==g){html+=`<div class="navgroup">${r.group}</div>`;g=r.group;}
-    html+=`<button class="nav" data-act="nav" data-v="${r.id}" ${S.route===r.id?'aria-current="page"':""}>${ic(r.icon)}<span>${r.label}</span>${r.id===ct&&!isPast()?'<span class="nb">ปัจจุบัน</span>':""}</button>`;}
+    html+=`<button class="nav" data-act="nav" data-v="${r.id}" title="${esc(r.label)}" ${S.route===r.id?'aria-current="page"':""}>${ic(r.icon)}<span class="nl">${r.nav||r.label}</span>${r.id===ct&&!isPast()?'<span class="nb">ปัจจุบัน</span>':""}</button>`;}
   document.getElementById("railNav").innerHTML=html;
   const bottom=["home","days","term","ops","more"];const shown=["home","days","term1","term2","ops"];
   document.getElementById("bottomNav").innerHTML=bottom.map(id=>{
@@ -176,9 +183,8 @@ function renderNav(){
     if(id==="term")return `<button data-act="nav" data-v="${ct}" ${S.route.startsWith("term")?'aria-current="page"':""}>${ic("cal")}<span>ภาค ${curTerm()}</span></button>`;
     const r=ROUTES.find(x=>x.id===id);return `<button data-act="nav" data-v="${id}" ${S.route===id?'aria-current="page"':""}>${ic(r.icon)}<span>${r.short||r.label}</span></button>`;}).join("");
   const c=S.cfg;
-  document.getElementById("brandName").textContent=c.systemName;
-  document.getElementById("brandSchool").textContent=`${c.name}${c.affiliation?" · "+c.affiliation:""}`;
-  document.getElementById("footSchool").textContent=c.name;
+  document.getElementById("brandName").textContent=c.name;
+  document.getElementById("brandSchool").textContent="ระบบปฏิทินการศึกษา";
   const ts=termStatus();
   document.getElementById("footYear").textContent=`ปีการศึกษา ${ts.Y} · ${ts.short}`;
   document.getElementById("todayChip").innerHTML=`${ic("cal")} ${fLong(TODAY)} · ${ts.short}`;
@@ -191,7 +197,7 @@ function renderNav(){
   const nm=(S.me&&S.me.name)||"ผู้ใช้งาน";
   document.getElementById("meName").textContent=nm;
   document.getElementById("meAv").textContent=nm.trim().charAt(0)||"?";
-  document.getElementById("meRole").textContent=ROLE_LABEL[role()]+(S.viewAs?" · ทดลองมุมมอง":"");
+  document.getElementById("meRole").textContent=ROLE_LABEL[role()]+(S.myRoles.length>1?" · สลับบทบาทได้":"");
 }
 function render(){
   if(!E)compute();
@@ -201,7 +207,7 @@ function render(){
   if(!ready){v.innerHTML=`<div class="loading">กำลังโหลดปฏิทิน…</div>`;return;}
   const r=ROUTES.find(x=>x.id===S.route);if(r&&r.min&&RANK[role()]<RANK[r.min])S.route="home";
   if(S.route==="setup"&&S.setupDirty&&document.getElementById("setupWrap"))return;
-  const fn={home:vHome,days:vDays,term1:()=>vTerm(1),term2:()=>vTerm(2),ops:vOps,holidays:vHolidays,plans:vPlans,trash:vTrash,people:vPeople,setup:vSetup}[S.route]||vHome;
+  const fn={home:vHome,days:vDays,term1:()=>vTerm(1),term2:()=>vTerm(2),ops:vOps,holidays:vHolidays,plans:vPlans,trash:vTrash,people:vPeople,setup:vSetup,guide:vGuide}[S.route]||vHome;
   const bar=isPast()?`<div class="pastbar"><span>กำลังดู<b> ปีการศึกษา ${S.viewYear} </b>(ข้อมูลย้อนหลัง/ล่วงหน้า) ข้อมูลทุกปีเก็บไว้ครบ</span><button class="btn sm" data-act="year-now">กลับไปปีการศึกษาปัจจุบัน ${currentYear()}</button></div>`:"";
   v.innerHTML=bar+fn(false);
   if(S.route==="people")loadNames();
@@ -337,51 +343,81 @@ const TGT={holiday:"วันหยุด/ชดเชย",plan:"แผนงา
 const OLDROLE={admin:"main",academic:"school",viewer:"teacher"};
 function vPeople(){
   const main=isMain();
-  const card=(k,title,items)=>`<div class="card role${S.realRole===k?" me":""}"><h4>${title}${S.realRole===k?' <span class="badge b-makeup">บทบาทของคุณ</span>':""}</h4><ul>${items.map(i=>`<li>${i}</li>`).join("")}</ul></div>`;
+  const card=(k,title,items)=>`<div class="card role${S.myRoles.includes(k)?" me":""}"><h4>${title}${S.myRoles.includes(k)?' <span class="badge b-makeup">บทบาทของคุณ</span>':""}</h4><ul>${items.map(i=>`<li>${i}</li>`).join("")}</ul></div>`;
   const nameOf=uid=>{const u=S.users.find(x=>x.id===uid);return u?(u.displayName||u.username):"ผู้ใช้งาน";};
   const q=(S.uSearch||"").trim().toLowerCase();const rf=prefs.uRoles||Object.keys(ROLE_LABEL);
-  const users=S.users.filter(u=>rf.includes(u.role)&&(!q||((u.displayName||"")+" "+(u.username||"")).toLowerCase().includes(q))).sort((a,b)=>RANK[b.role]-RANK[a.role]||(a.displayName||"").localeCompare(b.displayName||"","th"));
-  const urows=users.map(u=>`<tr><td><b>${esc(u.displayName||"-")}</b>${u.id===S.uid?' <span class="badge b-sample">คุณ</span>':""}</td><td class="num">${esc(u.username||"")}</td><td><span class="badge ${u.role==="teacher"?"b-sample":u.role==="main"?"b-holiday":"b-makeup"}">${ROLE_LABEL[u.role]||u.role}</span></td><td>${u.active===false?'<span class="badge b-holiday">ปิดการใช้งาน</span>':'<span class="badge" style="background:var(--d-budget-bg);color:var(--d-budget)">ใช้งานปกติ</span>'}</td><td class="muted num">${u.lastLogin?new Date(u.lastLogin).toLocaleString("th-TH",{dateStyle:"medium",timeStyle:"short"}):"ยังไม่เคยเข้า"}</td>${main?`<td class="acts"><button class="icobtn" data-act="user-edit" data-v="${u.id}" aria-label="แก้ไขผู้ใช้">${ic("edit")}</button></td>`:""}</tr>`).join("");
+  const users=S.users.filter(u=>rolesOf(u).some(r=>rf.includes(r))&&(!q||((u.displayName||"")+" "+(u.username||"")).toLowerCase().includes(q))).sort((a,b)=>RANK[topRole(rolesOf(b))]-RANK[topRole(rolesOf(a))]||(a.displayName||"").localeCompare(b.displayName||"","th"));
+  const urows=users.map(u=>`<tr><td><b>${esc(u.displayName||"-")}</b>${u.id===S.uid?' <span class="badge b-sample">คุณ</span>':""}</td><td class="num">${esc(u.username||"")}</td><td><div style="display:flex;gap:4px;flex-wrap:wrap">${rolesOf(u).sort((a,b)=>RANK[b]-RANK[a]).map(r=>`<span class="badge ${r==="teacher"?"b-sample":r==="main"?"b-holiday":"b-makeup"}">${ROLE_LABEL[r]}</span>`).join("")}</div></td><td>${u.active===false?'<span class="badge b-holiday">ปิดการใช้งาน</span>':'<span class="badge" style="background:var(--d-budget-bg);color:var(--d-budget)">ใช้งานปกติ</span>'}</td><td class="muted num">${u.lastLogin?new Date(u.lastLogin).toLocaleString("th-TH",{dateStyle:"medium",timeStyle:"short"}):"ยังไม่เคยเข้า"}</td>${main?`<td class="acts"><button class="icobtn" data-act="user-edit" data-v="${u.id}" aria-label="แก้ไขผู้ใช้">${ic("edit")}</button></td>`:""}</tr>`).join("");
   const logs=S.audit.slice(0,200).map(a=>`<div class="log"><span class="muted num">${new Date(a.at).toLocaleString("th-TH",{dateStyle:"medium",timeStyle:"short"})}</span><span><b>${esc(nameOf(a.uid))}</b><br><small class="muted">${ROLE_LABEL[a.role]||""}</small></span><span>${ACT[a.action]||a.action} ${TGT[a.target]||""} · ${esc(a.title||"")}${a.year?` <span class="muted">(ปี ${a.year})</span>`:""}</span></div>`).join("");
   return `<div class="roles">
-    ${card("main","แอดมินหลัก",["ทุกอย่างที่แอดมินโรงเรียนทำได้","เพิ่มผู้ใช้ กำหนดบทบาท และปิดการใช้งานบัญชี","ตั้งชื่อระบบ เปิดปีการศึกษาใหม่ และเลือกปีปัจจุบัน","ลบถาวร และล้างข้อมูลทั้งปี"])}
+    ${card("main","แอดมินหลัก",["ทุกอย่างที่แอดมินโรงเรียนทำได้","เพิ่มผู้ใช้ทีละหลายคน กำหนดบทบาท (ให้หนึ่งคนมีหลายบทบาทได้) และปิดการใช้งานบัญชี","ตั้งชื่อระบบ เปิดปีการศึกษาใหม่ และเลือกปีปัจจุบัน","ลบถาวร และล้างข้อมูลทั้งปี"])}
     ${card("school","แอดมินโรงเรียน",["เพิ่ม แก้ไข ลบวันหยุดและวันชดเชย","เพิ่มกิจกรรม/แผนงาน 4 ฝ่ายได้ทีละหลายรายการ","แก้ไขข้อมูลโรงเรียนและวันเปิด-ปิดภาค","กู้คืนรายการจากถังขยะ"])}
     ${card("teacher","ครู/บุคลากร",["ดูปฏิทินทุกมุมมองและทุกปีการศึกษา","คลิกวันที่เพื่อดูกิจกรรมของวันนั้น","พิมพ์เอกสาร PDF และรูปภาพ"])}
   </div>
-  <div class="toolbar"><div class="l"><input class="inp search" id="uSearch" placeholder="ค้นหาชื่อหรือชื่อผู้ใช้…" value="${esc(S.uSearch||"")}" data-input="u-search" aria-label="ค้นหาผู้ใช้">${ticks("urole",ROLE_LABEL,rf)}</div><div class="r">${RANK[S.realRole]>0?`<button class="btn" data-act="viewas-open">${ic("eye")}ทดลองมุมมองบทบาท</button>`:""}${main?`<button class="btn primary" data-act="user-add">${ic("plus")}เพิ่มผู้ใช้</button>`:""}</div></div>
-  <div class="card tbl-wrap"><table class="mtable"><thead><tr><th>ชื่อ-นามสกุล</th><th style="width:150px">ชื่อผู้ใช้</th><th style="width:150px">บทบาท</th><th style="width:130px">สถานะ</th><th style="width:170px">เข้าใช้ล่าสุด</th>${main?'<th style="width:60px"></th>':""}</tr></thead><tbody>${urows||`<tr><td colspan="6" class="empty">ไม่พบผู้ใช้</td></tr>`}</tbody></table></div>
+  <div class="toolbar"><div class="l"><input class="inp search" id="uSearch" placeholder="ค้นหาชื่อหรือชื่อผู้ใช้…" value="${esc(S.uSearch||"")}" data-input="u-search" aria-label="ค้นหาผู้ใช้">${ticks("urole",ROLE_LABEL,rf)}</div><div class="r">${main?`<button class="btn primary" data-act="user-add">${ic("plus")}เพิ่มผู้ใช้ (ได้หลายคน)</button>`:""}</div></div>
+  <div class="card tbl-wrap"><table class="mtable"><thead><tr><th>ชื่อ-นามสกุล</th><th style="width:150px">ชื่อผู้ใช้</th><th style="width:210px">บทบาท</th><th style="width:130px">สถานะ</th><th style="width:170px">เข้าใช้ล่าสุด</th>${main?'<th style="width:60px"></th>':""}</tr></thead><tbody>${urows||`<tr><td colspan="6" class="empty">ไม่พบผู้ใช้</td></tr>`}</tbody></table></div>
   <div class="card"><div class="cardhead"><h3>ประวัติการแก้ไข</h3><span class="muted" style="font-size:12.5px">${S.audit.length} รายการล่าสุด ทุกปีการศึกษา</span></div>${logs||`<div class="empty">ยังไม่มีการแก้ไข</div>`}</div>`;
 }
 function userForm(u){
-  const isNew=!u;u=u||{displayName:"",username:"",role:"teacher",active:true};const self=!isNew&&u.id===S.uid;
-  modal(isNew?"เพิ่มผู้ใช้":"แก้ไขผู้ใช้",
-  `<div class="field"><label for="uName">ชื่อ-นามสกุล <i>*</i></label><input class="inp" id="uName" maxlength="80" value="${esc(u.displayName)}" placeholder="เช่น ครูสมใจ ใจดี"></div>
-   <div class="grid2"><div class="field"><label for="uUser">ชื่อผู้ใช้ (ใช้เข้าสู่ระบบ) <i>*</i></label><input class="inp" id="uUser" maxlength="30" value="${esc(u.username)}" ${isNew?"":"disabled"} placeholder="a-z 0-9 . _ - อย่างน้อย 3 ตัว" autocomplete="off" autocapitalize="none"></div>
-   ${isNew?`<div class="field"><label for="uPw">รหัสผ่านเริ่มต้น <i>*</i></label><input class="inp" id="uPw" type="text" minlength="6" maxlength="64" placeholder="อย่างน้อย 6 ตัวอักษร" autocomplete="new-password"></div>`:"<div></div>"}</div>
-   <div class="field"><label>บทบาท</label>${ticks("uRole",ROLE_LABEL,[u.role],{type:"radio",name:"uRole"})}</div>
-   ${isNew?"":`<div class="field"><label>สถานะบัญชี</label>${ticks("uAct",{on:"ใช้งานปกติ",off:"ปิดการใช้งาน"},[u.active===false?"off":"on"],{type:"radio",name:"uAct"})}</div>`}
-   ${self?'<p class="ro-note">นี่คือบัญชีของคุณเอง เปลี่ยนบทบาทหรือปิดการใช้งานตัวเองไม่ได้</p>':""}
-   ${isNew?'<p class="ro-note">แจ้งชื่อผู้ใช้และรหัสผ่านเริ่มต้นให้ครู แล้วให้ครูเปลี่ยนรหัสผ่านเองหลังเข้าสู่ระบบครั้งแรก (กดที่ชื่อมุมขวาบน)</p>':""}<div class="err" id="fErr" hidden></div>`,
-  `${!isNew&&!self?`<button class="btn danger l" data-act="user-del" data-v="${u.id}">${ic("trash")}ลบผู้ใช้</button>`:""}<button class="btn" data-act="close">ยกเลิก</button><button class="btn primary" data-act="user-save" data-v="${isNew?"":u.id}">บันทึก</button>`);
-  if(self)MR.querySelectorAll('[data-tick="uRole"],[data-tick="uAct"]').forEach(i=>i.disabled=true);
+  if(!u)return userBulkForm();
+  const self=u.id===S.uid;const rs=rolesOf(u);
+  modal("แก้ไขผู้ใช้",
+  `<div class="field"><label for="uName">ชื่อ-นามสกุล <i>*</i></label><input class="inp" id="uName" maxlength="80" value="${esc(u.displayName||"")}"></div>
+   <div class="field"><label>ชื่อผู้ใช้</label><input class="inp num" value="${esc(u.username||"")}" disabled></div>
+   <div class="field"><label>บทบาท <span class="muted" style="font-weight:400">ติ๊กได้หลายบทบาท ผู้ใช้สลับบทบาทเองได้จากเมนูชื่อมุมขวาบน</span></label>${ticks("uRoles",ROLE_LABEL,rs)}</div>
+   <div class="field"><label>สถานะบัญชี</label>${ticks("uAct",{on:"ใช้งานปกติ",off:"ปิดการใช้งาน"},[u.active===false?"off":"on"],{type:"radio",name:"uAct"})}</div>
+   ${self?'<p class="ro-note">นี่คือบัญชีของคุณเอง เปลี่ยนบทบาทหรือปิดการใช้งานตัวเองไม่ได้ เพื่อกันไม่ให้ระบบไม่มีแอดมินหลัก</p>':""}<div class="err" id="fErr" hidden></div>`,
+  `${!self?`<button class="btn danger l" data-act="user-del" data-v="${u.id}">${ic("trash")}ลบผู้ใช้</button>`:""}<button class="btn" data-act="close">ยกเลิก</button><button class="btn primary" data-act="user-save" data-v="${u.id}">บันทึก</button>`);
+  if(self)MR.querySelectorAll('[data-tick="uRoles"],[data-tick="uAct"]').forEach(i=>i.disabled=true);
 }
+/* ---- add many users at once ---- */
+const PWCH="abcdefghjkmnpqrstuvwxyz23456789";
+const randPw=()=>{const a=new Uint32Array(8);crypto.getRandomValues(a);return [...a].map(x=>PWCH[x%PWCH.length]).join("");};
+function bulkRow(n,u,p){return `<div class="brow"><span class="k"></span><input class="inp bn" maxlength="80" placeholder="ชื่อ-นามสกุล" value="${esc(n||"")}" aria-label="ชื่อ-นามสกุล"><input class="inp bu num" maxlength="30" placeholder="ชื่อผู้ใช้" autocapitalize="none" spellcheck="false" value="${esc(u||"")}" aria-label="ชื่อผู้ใช้"><input class="inp bp num" maxlength="64" placeholder="รหัสผ่าน" value="${esc(p||"")}" aria-label="รหัสผ่าน"><button type="button" class="icobtn del" data-act="brow-del" aria-label="ลบแถว">${ic("close")}</button></div>`;}
+function userBulkForm(){
+  modal("เพิ่มผู้ใช้",
+  `<div class="field"><label>บทบาทของผู้ใช้ที่เพิ่มรอบนี้ <span class="muted" style="font-weight:400">ติ๊กได้หลายบทบาท</span></label>${ticks("bRoles",ROLE_LABEL,["teacher"])}</div>
+   <div class="field"><label>รายชื่อ <span class="muted" style="font-weight:400">คัดลอกจาก Excel 3 คอลัมน์ (ชื่อ-นามสกุล · ชื่อผู้ใช้ · รหัสผ่าน) แล้ววางในช่องแรกได้เลย</span></label>
+    <div class="bwrap"><div class="brows" id="brows"><div class="brow bhead"><span></span><span>ชื่อ-นามสกุล</span><span>ชื่อผู้ใช้ (a-z 0-9 . _ -)</span><span>รหัสผ่าน (6 ตัวขึ้นไป)</span><span></span></div>${bulkRow()}${bulkRow()}${bulkRow()}</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn sm" data-act="brow-add">${ic("plus")}เพิ่มแถว</button><button type="button" class="btn sm" data-act="brow-pw">สุ่มรหัสผ่านให้ช่องที่ว่าง</button></div></div>
+   <div class="sumline" id="bSum"></div><div class="err" id="fErr" hidden style="white-space:pre-line"></div>`,
+  `<button class="btn" data-act="close">ยกเลิก</button><button class="btn primary" data-act="bulk-save" id="bSave">บันทึก</button>`,true);
+  numberBrows();
+}
+function numberBrows(){const rs=MR.querySelectorAll(".brow:not(.bhead)");rs.forEach((r,i)=>{r.querySelector(".k").textContent=i+1;r.querySelector('[data-act="brow-del"]').hidden=rs.length<2;});updBulk();}
+function bulkData(){return [...MR.querySelectorAll(".brow:not(.bhead)")].map((r,i)=>({i:i+1,name:r.querySelector(".bn").value.trim(),user:r.querySelector(".bu").value.trim().toLowerCase(),pw:r.querySelector(".bp").value})).filter(x=>x.name||x.user||x.pw);}
+function updBulk(){const el=document.getElementById("bSum");if(!el)return;const n=bulkData().length;const rs=checked("bRoles");
+  el.innerHTML=`จะเพิ่มผู้ใช้ <b>${n}</b> คน · บทบาท: ${rs.length?rs.map(r=>ROLE_LABEL[r]).join(" + "):"ยังไม่ได้เลือก"}`;const b=document.getElementById("bSave");if(b)b.textContent=n>1?`บันทึก ${n} คน`:"บันทึก";}
+function addBrow(n,u,p,after){const h=bulkRow(n,u,p);if(after)after.insertAdjacentHTML("afterend",h);else document.getElementById("brows").insertAdjacentHTML("beforeend",h);numberBrows();}
+async function saveBulk(btn){
+  const rows=bulkData();const roles=checked("bRoles");const errs=[];
+  if(!roles.length)errs.push("ติ๊กบทบาทอย่างน้อย 1 บทบาท");
+  if(!rows.length)errs.push("กรอกรายชื่ออย่างน้อย 1 คน");
+  const seen=new Set(S.users.map(u=>u.username));
+  for(const r of rows){const p=[];if(!r.name)p.push("ไม่มีชื่อ");if(!okUsername(r.user))p.push("ชื่อผู้ใช้ไม่ถูกต้อง");else if(seen.has(r.user))p.push(`ชื่อผู้ใช้ ${r.user} ซ้ำ`);if(r.pw.length<6)p.push("รหัสผ่านสั้นกว่า 6 ตัว");
+    if(p.length)errs.push(`แถว ${r.i}: ${p.join(", ")}`);seen.add(r.user);}
+  if(errs.length)return showErr("fErr",errs.slice(0,8).join("\n")+(errs.length>8?`\n…และอีก ${errs.length-8} รายการ`:""));
+  const role=topRole(roles);const res=[];btn.disabled=true;
+  for(const r of rows){btn.textContent=`กำลังเพิ่ม ${res.length+1}/${rows.length}`;
+    try{const cred=await createUserWithEmailAndPassword(secondaryAuth(),toEmail(r.user),r.pw);
+      await setDoc(doc(fs,"users",cred.user.uid),{username:r.user,displayName:r.name,role,roles,active:true,createdAt:new Date().toISOString(),createdBy:S.uid});
+      await signOut(secondaryAuth()).catch(()=>{});res.push({...r,ok:true});}
+    catch(e){res.push({...r,ok:false,err:e&&e.code&&e.code.startsWith("auth/")?authErr(e):errText(e)});}}
+  const ok=res.filter(x=>x.ok).length;audit("create","user",`${ok} คน (${roles.map(r=>ROLE_LABEL[r]).join(", ")})`);
+  S.bulkResult=res;bulkResult();
+}
+function bulkResult(){const res=S.bulkResult||[];const ok=res.filter(x=>x.ok);
+  modal(`เพิ่มผู้ใช้แล้ว ${ok.length} จาก ${res.length} คน`,`<p class="ro-note" style="margin:0">เก็บชื่อผู้ใช้และรหัสผ่านไว้แจกครู ปิดหน้าต่างนี้แล้วจะดูรหัสผ่านอีกไม่ได้</p>
+   <div class="tbl-wrap card"><table class="mtable"><thead><tr><th>ชื่อ-นามสกุล</th><th>ชื่อผู้ใช้</th><th>รหัสผ่าน</th><th>ผล</th></tr></thead><tbody>${res.map(r=>`<tr><td>${esc(r.name)}</td><td class="num">${esc(r.user)}</td><td class="num">${r.ok?esc(r.pw):"–"}</td><td>${r.ok?'<span class="badge" style="background:var(--d-budget-bg);color:var(--d-budget)">สำเร็จ</span>':`<span class="badge b-holiday">${esc(r.err)}</span>`}</td></tr>`).join("")}</tbody></table></div>`,
+  `${ok.length?`<button class="btn l" data-act="bulk-copy">คัดลอกรายชื่อ</button><button class="btn" data-act="bulk-csv">ดาวน์โหลดไฟล์ Excel (CSV)</button>`:""}<button class="btn primary" data-act="close">เสร็จสิ้น</button>`,true);}
+function bulkText(sep){return ["ชื่อ-นามสกุล","ชื่อผู้ใช้","รหัสผ่าน"].join(sep)+"\n"+(S.bulkResult||[]).filter(x=>x.ok).map(r=>[r.name,r.user,r.pw].map(v=>sep===","?`"${String(v).replace(/"/g,'""')}"`:v).join(sep)).join("\n");}
 async function saveUser(id,btn){
-  const name=val("uName").trim();const role=checked("uRole")[0]||"teacher";
-  if(!name)return showErr("fErr","กรอกชื่อ-นามสกุล");
+  const name=val("uName").trim();if(!name)return showErr("fErr","กรอกชื่อ-นามสกุล");
+  const patch={displayName:name};
+  if(id!==S.uid){const rs=checked("uRoles");if(!rs.length)return showErr("fErr","ติ๊กบทบาทอย่างน้อย 1 บทบาท");patch.roles=rs;patch.role=topRole(rs);patch.active=(checked("uAct")[0]||"on")==="on";}
   btn.disabled=true;
-  try{
-    if(id){const patch={displayName:name};if(id!==S.uid){patch.role=role;patch.active=(checked("uAct")[0]||"on")==="on";}
-      await updateDoc(doc(fs,"users",id),patch);closeModal();toast("บันทึกข้อมูลผู้ใช้แล้ว");audit("update","user",name);}
-    else{const un=val("uUser").trim().toLowerCase();const pw=val("uPw");
-      if(!okUsername(un)){btn.disabled=false;return showErr("fErr","ชื่อผู้ใช้ใช้ได้เฉพาะ a-z 0-9 . _ - ยาว 3–30 ตัว");}
-      if(pw.length<6){btn.disabled=false;return showErr("fErr","รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");}
-      if(S.users.some(u=>u.username===un)){btn.disabled=false;return showErr("fErr","ชื่อผู้ใช้นี้มีอยู่แล้ว");}
-      btn.textContent="กำลังสร้างบัญชี…";
-      const cred=await createUserWithEmailAndPassword(secondaryAuth(),toEmail(un),pw);
-      await setDoc(doc(fs,"users",cred.user.uid),{username:un,displayName:name,role,active:true,createdAt:new Date().toISOString(),createdBy:S.uid});
-      await signOut(secondaryAuth()).catch(()=>{});
-      closeModal();toast(`เพิ่มผู้ใช้ ${name} แล้ว`);audit("create","user",`${name} (${ROLE_LABEL[role]})`);}
-  }catch(e){btn.disabled=false;btn.textContent="บันทึก";showErr("fErr",e&&e.code&&e.code.startsWith("auth/")?authErr(e):errText(e));}
+  try{await updateDoc(doc(fs,"users",id),patch);closeModal();toast("บันทึกข้อมูลผู้ใช้แล้ว");audit("update","user",name+(patch.roles?` (${patch.roles.map(r=>ROLE_LABEL[r]).join(", ")})`:""));}
+  catch(e){btn.disabled=false;showErr("fErr",errText(e));}
 }
 async function deleteUser(id){const u=S.users.find(x=>x.id===id);if(!u)return;
   const ok=await confirmBox("ลบผู้ใช้?",`“${esc(u.displayName||u.username)}” จะเข้าสู่ระบบไม่ได้อีก หากต้องการลบบัญชีออกจาก Firebase ทั้งหมด ให้ลบที่ Firebase Console → Authentication ด้วย`,"ลบผู้ใช้");MR.innerHTML="";if(!ok)return;
@@ -395,6 +431,30 @@ async function savePw(btn){const o=val("pwOld"),n=val("pwNew"),n2=val("pwNew2");
   if(n.length<6)return showErr("fErr","รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร");if(n!==n2)return showErr("fErr","รหัสผ่านใหม่ทั้งสองช่องไม่ตรงกัน");
   btn.disabled=true;try{const u=auth.currentUser;await reauthenticateWithCredential(u,EmailAuthProvider.credential(u.email,o));await updatePassword(u,n);closeModal();toast("เปลี่ยนรหัสผ่านแล้ว");}
   catch(e){btn.disabled=false;showErr("fErr",authErr(e));}}
+function vGuide(){
+  const r=RANK[S.realRole];
+  const sec=(id,title,min,body)=>RANK[min]<=r?{id,title,min,body}:null;
+  const tag=m=>m==="teacher"?"":`<span class="badge ${m==="main"?"b-holiday":"b-makeup"}">สำหรับ${ROLE_LABEL[m]}${m==="school"?"ขึ้นไป":""}</span>`;
+  const S2=[
+   sec("start","เริ่มต้นใช้งาน","teacher",`<ol><li>เปิดเว็บไซต์ระบบ กรอก<b>ชื่อผู้ใช้</b>และ<b>รหัสผ่าน</b>ที่ได้รับจากแอดมินหลัก แล้วกด "เข้าสู่ระบบ"</li><li>เข้าครั้งแรกแล้วให้<b>เปลี่ยนรหัสผ่าน</b>ทันที: กดที่ชื่อของคุณมุมขวาบน → "เปลี่ยนรหัสผ่าน"</li><li>บนคอมพิวเตอร์ใช้เมนูด้านซ้าย บนมือถือใช้แถบเมนูด้านล่าง และกด "เมนู" เพื่อดูหน้าอื่นเพิ่มเติม</li><li>มุมขวาบนมีปุ่มเลือก<b>ปีการศึกษา</b> ใช้ดูข้อมูลย้อนหลังหรือปีถัดไป</li></ol>`),
+   sec("home","หน้าภาพรวม","teacher",`<p>บอกว่า<b>วันนี้เป็นวันเรียนที่เท่าไร</b> อยู่ภาคเรียนไหน สัปดาห์ที่เท่าไร มีกราฟแท่งวันเรียนรายเดือน แถบสีทองคือส่วนที่ผ่านมาแล้ว ยอดวันเรียนแต่ละภาคและทั้งปี เทียบเกณฑ์ 200 วัน รวมถึงกำหนดการ 30 วันข้างหน้า และวันหยุดที่จะถึง</p>`),
+   sec("days","ตารางวันเรียน Day 1–200","teacher",`<p>ตารางทั้งปีการศึกษา หนึ่งแถวคือหนึ่งเดือน ตัวเลขในช่องคือ<b>ลำดับวันเรียนสะสม</b> ระบบนับให้อัตโนมัติ โดยไม่นับเสาร์–อาทิตย์และวันหยุด แต่นับวันเรียนชดเชย</p><ul><li>สีทองอ่อน = วันเรียนปกติ · สีแดง = วันหยุดราชการ · สีส้ม = วันหยุดพิเศษ · สีน้ำเงิน = วันเรียนชดเชย</li><li>ช่องที่มี<b>กรอบทอง</b>คือวันเรียนที่ 200 · คอลัมน์ขวาสุดคือยอดวันเรียนของเดือน</li><li>คลิกช่องวันที่เพื่อดูรายละเอียดของวันนั้น</li></ul>`),
+   sec("term","ปฏิทินรายภาคเรียน","teacher",`<p>ปฏิทินรายเดือนของภาคเรียนที่ 1 และ 2 คู่กับตารางวันหยุด วันหยุดพิเศษ และวันเรียนชดเชยของแต่ละเดือน พร้อมยอดวันเรียนรายเดือนและยอดสะสม เมนูจะมีป้าย <b>"ปัจจุบัน"</b> ที่ภาคเรียนที่กำลังเรียนอยู่ และเปลี่ยนให้เองเมื่อขึ้นภาคใหม่</p>`),
+   sec("ops","แผนปฏิบัติงาน 4 ฝ่าย","teacher",`<p>ปฏิทินรายเดือนพร้อมเลขสัปดาห์ คู่กับงานของ 4 ฝ่าย ได้แก่ บริหารงานวิชาการ ทั่วไป บุคคล และงบประมาณ</p><ul><li>เลือกดูภาคเรียนที่ 1, 2 หรือทั้งปี ได้จากปุ่มด้านบน</li><li><b>ติ๊กเลือกฝ่าย</b>ที่จะแสดงได้ ระบบจำค่าไว้ให้</li><li>คลิกวันที่ในปฏิทินเพื่อดูกิจกรรมทั้งหมดของวันนั้น</li></ul>`),
+   sec("print","พิมพ์เอกสาร / PDF / รูปภาพ","teacher",`<ol><li>เปิดหน้าตารางวันเรียน ปฏิทินภาคเรียน หรือแผน 4 ฝ่าย แล้วกด <b>"พิมพ์เอกสาร"</b></li><li>หน้าตัวอย่างจะแสดงกระดาษ A4 ทุกหน้า เลือก<b>แนวกระดาษ</b>และ<b>การแบ่งหน้า</b> (ต่อเนื่อง หรือเดือนละหน้า) ได้</li><li>กด <b>"สั่งพิมพ์"</b> เพื่อส่งเข้าเครื่องพิมพ์ หรือกด <b>"ดาวน์โหลด PDF"</b> / <b>"ดาวน์โหลดรูป PNG"</b> (หลายหน้าจะได้ไฟล์ .zip) หรือบันทึกรูปทีละหน้าก็ได้</li></ol><p>ตารางของเดือนเดียวกันจะไม่ถูกตัดข้ามหน้า และทุกหน้ามีหัวกระดาษของโรงเรียน</p>`),
+   sec("holiday","เพิ่มวันหยุด / วันเรียนชดเชย","school",`<ol><li>คลิกวันที่ในปฏิทินใดก็ได้ → "กำหนดเป็นวันหยุด/ชดเชย" หรือไปที่เมนู "วันหยุด / วันชดเชย" → "เพิ่มวันหยุด/วันชดเชย"</li><li>เลือกวันที่ ถ้าหลายวันให้เลือก "ถึงวันที่" ด้วย</li><li>เลือก<b>ประเภทวัน</b>: วันหยุดราชการ / วันหยุดพิเศษ / <b>วันเรียนชดเชย</b> (ระบบจะนับเป็นวันเรียน แม้ตรงกับวันเสาร์)</li><li>กด "บันทึก" แล้วระบบจะคำนวณวันเรียนใหม่ทันที</li></ol>`),
+   sec("plan","เพิ่มกิจกรรม / แผนงาน (ได้หลายรายการ)","school",`<ol><li>คลิกวันที่ → "เพิ่มกิจกรรมวันนี้" หรือกด "+ เพิ่ม" ที่หัวคอลัมน์ของฝ่ายในหน้าแผน 4 ฝ่าย</li><li><b>ติ๊กฝ่ายงาน</b> ติ๊กได้หลายฝ่าย ระบบจะบันทึกให้ทุกฝ่ายที่เลือก</li><li>พิมพ์ชื่อกิจกรรม แล้วกด <b>Enter</b> เพื่อขึ้นกิจกรรมถัดไป หรือ<b>วางรายการหลายบรรทัด</b>ที่คัดลอกมาได้เลย ระบบจะแยกเป็นหลายกิจกรรมให้ ใส่เวลาของแต่ละกิจกรรมได้</li><li>ใต้ฟอร์มจะบอกว่าจะบันทึกกี่รายการ เช่น 3 กิจกรรม × 2 ฝ่าย = 6 รายการ</li></ol>`),
+   sec("trash","แก้ไข ลบ และกู้คืน","school",`<p>กดไอคอนดินสอเพื่อแก้ไข กดไอคอนถังขยะเพื่อลบ รายการที่ลบจะไปอยู่ที่เมนู <b>"ถังขยะ"</b> และกด "กู้คืน" ได้ทุกเมื่อ เฉพาะแอดมินหลักที่ลบถาวรได้ ทุกการแก้ไขบันทึกไว้ใน "ผู้ใช้งานและประวัติ"</p>`),
+   sec("term-set","ตั้งวันเปิด-ปิดภาคเรียน","school",`<p>เมนู "ตั้งค่าระบบ" → "วันเปิด-ปิดภาคเรียน" เลือกวันด้วยปฏิทินไทย พ.ศ. แล้วกดบันทึก ระบบจะคำนวณ Day 1–200 สัปดาห์ที่ และภาคเรียนปัจจุบันใหม่ทั้งหมด</p>`),
+   sec("users","เพิ่มผู้ใช้ทีละหลายคน","main",`<ol><li>เมนู "ผู้ใช้งานและประวัติ" → <b>"เพิ่มผู้ใช้ (ได้หลายคน)"</b></li><li><b>ติ๊กบทบาท</b>ของผู้ใช้รอบนี้ ติ๊กได้หลายบทบาท</li><li>กรอกชื่อ-นามสกุล ชื่อผู้ใช้ และรหัสผ่านทีละแถว หรือ<b>คัดลอก 3 คอลัมน์จาก Excel</b> แล้ววางในช่องแรก</li><li>กด "สุ่มรหัสผ่านให้ช่องที่ว่าง" ถ้าอยากให้ระบบสร้างรหัสผ่านให้</li><li>กดบันทึก แล้ว<b>คัดลอกรายชื่อหรือดาวน์โหลดไฟล์ Excel</b> เก็บไว้แจกครู ปิดหน้าต่างแล้วจะดูรหัสผ่านอีกไม่ได้</li></ol>`),
+   sec("roles","บทบาทและการสลับบทบาท","main",`<p>หนึ่งคนมีได้หลายบทบาท เช่น แอดมินหลัก + แอดมินโรงเรียน ให้กดไอคอนดินสอที่ผู้ใช้ แล้วติ๊กบทบาทที่ต้องการ ผู้ใช้ที่มีหลายบทบาทสลับบทบาทเองได้ที่ <b>ชื่อมุมขวาบน → "ใช้งานในบทบาท"</b> ระบบจำบทบาทล่าสุดไว้ให้</p><ul><li><b>แอดมินหลัก</b>: ทำได้ทุกอย่าง รวมถึงจัดการผู้ใช้ ปีการศึกษา ชื่อระบบ ลบถาวร และล้างข้อมูล</li><li><b>แอดมินโรงเรียน</b>: จัดการวันหยุด แผนงาน ข้อมูลโรงเรียน และวันเปิด-ปิดภาค</li><li><b>ครู/บุคลากร</b>: ดูและพิมพ์เอกสาร</li></ul><p>ปิดการใช้งานบัญชีได้โดยไม่ต้องลบ ผู้ใช้จะเข้าระบบไม่ได้ทันที</p>`),
+   sec("year","เปิดปีการศึกษาใหม่","main",`<ol><li>เมนู "ตั้งค่าระบบ" → "เปิดปีการศึกษาใหม่"</li><li>ตรวจวันเปิด-ปิดภาค (ระบบเสนอให้) แล้วเลือกว่าจะ<b>คัดลอกแผนงาน 4 ฝ่ายจากปีก่อน</b>หรือไม่ ระบบจะเลื่อนไป 52 สัปดาห์ให้ตรงวันในสัปดาห์เดิม</li><li>เพิ่มวันหยุดราชการของปีใหม่ตามประกาศ</li></ol><p>ข้อมูลปีเก่าเก็บไว้ครบ เมื่อสิ้นปีการศึกษา ระบบจะขึ้นเป็นปีใหม่ให้เอง</p>`),
+   sec("faq","คำถามที่พบบ่อย","teacher",`<p><b>ลืมรหัสผ่าน</b>: ติดต่อแอดมินหลัก แอดมินหลักลบบัญชีในระบบและใน Firebase Console → Authentication แล้วเพิ่มบัญชีใหม่ด้วยชื่อผู้ใช้เดิม</p><p><b>เข้าระบบไม่ได้ ขึ้นว่า "บัญชีถูกปิดการใช้งาน"</b>: ติดต่อแอดมินหลักให้เปิดใช้งาน</p><p><b>ข้อมูลไม่อัปเดต</b>: กด Ctrl + Shift + R เพื่อโหลดหน้าใหม่ ปกติข้อมูลจะอัปเดตเองทันทีที่มีคนแก้ไข</p><p><b>ติดตั้งเป็นแอปบนมือถือ</b>: เปิดเว็บใน Chrome หรือ Safari → เมนูแชร์ → "เพิ่มไปยังหน้าจอหลัก"</p>`)
+  ].filter(Boolean);
+  return `<div class="guide"><nav class="gtoc card" aria-label="สารบัญคู่มือ"><b>สารบัญ</b>${S2.map((x,i)=>`<button class="gt" data-act="guide-go" data-v="g-${x.id}"><span class="num">${i+1}</span>${x.title}</button>`).join("")}</nav>
+   <div class="gbody">${S2.map((x,i)=>`<section class="card gsec" id="g-${x.id}"><h2><span class="gn num">${i+1}</span>${x.title} ${tag(x.min)}</h2>${x.body}</section>`).join("")}
+   <p class="credit">ระบบปฏิทินการศึกษาและแผนปฏิบัติงาน · พัฒนาโดย <b>ครูซอสสอนสังคม</b> 2569</p></div></div>`;
+}
 function vSetup(){
   if(!canWrite())return `<div class="card empty">หน้านี้สำหรับแอดมินเท่านั้น</div>`;
   const c=S.cfg;const cy=currentYear();
@@ -485,11 +545,6 @@ function numberRows(){const rs=MR.querySelectorAll(".prow");rs.forEach((r,i)=>{r
 function updSum(){const el=document.getElementById("pSum");if(!el)return;const nd=MR.querySelectorAll('[data-tick="pD"]:checked').length;const nr=[...MR.querySelectorAll(".pn")].filter(i=>i.value.trim()).length;
   el.innerHTML=`จะบันทึก <b>${nd*nr}</b> รายการ (${nr} กิจกรรม × ${nd} ฝ่าย)`;const b=document.getElementById("pSave");if(b)b.textContent=nd*nr>1?`บันทึก ${nd*nr} รายการ`:"บันทึก";}
 function addRow(time,title,after){const html=rowHTML(time,title);if(after)after.insertAdjacentHTML("afterend",html);else document.getElementById("rows").insertAdjacentHTML("beforeend",html);numberRows();updSum();}
-function viewAsDialog(){
-  const opts=Object.keys(ROLE_LABEL).filter(k=>RANK[k]<=RANK[S.realRole]);
-  modal("มุมมองบทบาท",`<p class="muted" style="margin:0;font-size:13.5px">ทดลองดูระบบในมุมมองของบทบาทอื่น ใช้ตรวจสอบว่าผู้ใช้แต่ละระดับเห็นอะไรบ้าง สิทธิ์จริงของคุณไม่เปลี่ยน</p>${ticks("va",Object.fromEntries(opts.map(k=>[k,ROLE_LABEL[k]+(k===S.realRole?" (บทบาทจริง)":"")])),[role()],{type:"radio",name:"va"})}`,
-  `<button class="btn" data-act="close">ยกเลิก</button><button class="btn primary" data-act="viewas-apply">ใช้มุมมองนี้</button>`);
-}
 function newYearDialog(){
   const ny=Math.max(...yearList())+1;const d=defaultsFor(ny);const src=Math.max(...yearList());
   const nSrc=S.plans.filter(p=>!p.deleted&&p.start&&yearOf(p.start)===src).length;
@@ -501,7 +556,7 @@ function newYearDialog(){
 }
 
 /* ================= writes ================= */
-async function audit(action,target,title,year){try{await S.db.collection("audit").add({at:new Date().toISOString(),uid:S.uid||"",role:S.realRole,action,target,title:String(title||"").slice(0,200),year:year||S.viewYear});}catch(e){}}
+async function audit(action,target,title,year){try{await S.db.collection("audit").add({at:new Date().toISOString(),uid:S.uid||"",role:role(),action,target,title:String(title||"").slice(0,200),year:year||S.viewYear});}catch(e){}}
 function readRange(prefix){const s=document.getElementById(prefix+"S").value;const e=document.getElementById(prefix+"E").value;return{s,e:e&&e>=s?e:s,bad:!!(e&&e<s)};}
 const checked=(g)=>[...MR.querySelectorAll(`[data-tick="${g}"]:checked`)].map(i=>i.value);
 async function saveHol(id){
@@ -713,7 +768,7 @@ async function doSetup(){
     let cred;try{cred=await createUserWithEmailAndPassword(auth,toEmail(un),pw);}catch(e){if(e.code==="auth/email-already-in-use")cred=await signInWithEmailAndPassword(auth,toEmail(un),pw);else throw e;}
     const uid=cred.user.uid;const Y=yearOf(TODAY);const at=new Date().toISOString();
     const b=writeBatch(fs);
-    b.set(doc(fs,"users",uid),{username:un,displayName:name,role:"main",active:true,createdAt:at});
+    b.set(doc(fs,"users",uid),{username:un,displayName:name,role:"main",roles:["main"],active:true,createdAt:at});
     b.set(doc(fs,"config","bootstrap"),{at,by:uid});
     b.set(doc(fs,"config","system"),{systemName:DEF_SYS,currentYear:Y});
     b.set(doc(fs,"config","school"),{name:school,affiliation:aff});
@@ -733,9 +788,10 @@ function fitGate(){const g=document.getElementById("gate");const w=g&&g.querySel
   if(h>availH&&h>0)w.style.transform=`scale(${Math.max(.5,availH/h)})`;}
 window.addEventListener("resize",()=>{if(!signedIn)fitGate();});
 function meMenu(){
-  const nm=(S.me&&S.me.name)||"ผู้ใช้งาน";const un=S.myUser&&S.myUser.username;
-  modal("บัญชีผู้ใช้",`<div class="acct"><span class="av">${esc(nm.charAt(0))}</span><div><b>${esc(nm)}</b>${un?`<span class="muted num" style="font-size:13px">${esc(un)}</span> `:""}<span class="badge b-makeup">${ROLE_LABEL[S.realRole]}</span>${S.viewAs?` <span class="badge b-sample">กำลังดูแบบ${ROLE_LABEL[S.viewAs]}</span>`:""}</div></div>`,
-  `${RANK[S.realRole]>0?`<button class="btn l" data-act="viewas-open">${ic("eye")}ทดลองมุมมองบทบาท</button>`:""}<button class="btn" data-act="pw-open">เปลี่ยนรหัสผ่าน</button><button class="btn danger" data-act="sign-out">ออกจากระบบ</button>`);
+  const nm=(S.me&&S.me.name)||"ผู้ใช้งาน";const un=S.myUser&&S.myUser.username;const multi=S.myRoles.length>1;
+  modal("บัญชีผู้ใช้",`<div class="acct"><span class="av">${esc(nm.charAt(0))}</span><div style="min-width:0"><b>${esc(nm)}</b><span class="muted num" style="font-size:13px">${esc(un||"")}</span><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">${S.myRoles.map(r=>`<span class="badge ${r==="teacher"?"b-sample":r==="main"?"b-holiday":"b-makeup"}">${ROLE_LABEL[r]}</span>`).join("")}</div></div></div>
+   ${multi?`<div class="field"><label>ใช้งานในบทบาท</label>${ticks("myRole",Object.fromEntries(S.myRoles.sort((a,b)=>RANK[b]-RANK[a]).map(r=>[r,ROLE_LABEL[r]])),[role()],{type:"radio",name:"myRole"})}<p class="ro-note" style="margin:0">บัญชีนี้มี ${S.myRoles.length} บทบาท เลือกบทบาทที่จะใช้ทำงานตอนนี้ได้ ระบบจำค่าไว้ให้</p></div>`:""}`,
+  `<button class="btn l" data-act="pw-open">เปลี่ยนรหัสผ่าน</button><button class="btn danger" data-act="sign-out">ออกจากระบบ</button>`);
 }
 /* ================= logo ================= */
 function fileToLogo(file){return new Promise((res,rej)=>{const r=new FileReader();r.onerror=rej;r.onload=()=>{const im=new Image();im.onerror=rej;im.onload=()=>{const N=256;const cv=document.createElement("canvas");cv.width=N;cv.height=N;const cx=cv.getContext("2d");const k=Math.min(N/im.width,N/im.height);const w=im.width*k,h=im.height*k;cx.drawImage(im,(N-w)/2,(N-h)/2,w,h);res(cv.toDataURL("image/png"));};im.src=r.result;};r.readAsDataURL(file);});}
@@ -774,8 +830,7 @@ document.addEventListener("click",async ev=>{
     case "purge":purge(t.dataset.c,v);break;
     case "reset":resetYear();break;
     case "viewas":meMenu();break;
-    case "viewas-open":viewAsDialog();break;
-    case "sign-out":S.viewAs=null;MR.innerHTML="";closePreview();S.route="home";S.loginErr="";signOut(auth);break;
+    case "sign-out":MR.innerHTML="";closePreview();S.route="home";S.loginErr="";signOut(auth);break;
     case "pw-open":pwForm();break;
     case "pw-save":savePw(t);break;
     case "pw-eye":{const i=document.getElementById("lgP");if(i)i.type=i.type==="password"?"text":"password";break;}
@@ -783,13 +838,19 @@ document.addEventListener("click",async ev=>{
     case "user-edit":userForm(S.users.find(u=>u.id===v));break;
     case "user-save":saveUser(v,t);break;
     case "user-del":deleteUser(v);break;
+    case "brow-add":addBrow();{const a=MR.querySelectorAll(".bn");a[a.length-1].focus();}break;
+    case "brow-del":{const r=t.closest(".brow");r.remove();numberBrows();break;}
+    case "brow-pw":MR.querySelectorAll(".brow:not(.bhead)").forEach(r=>{const n=r.querySelector(".bn").value.trim(),p=r.querySelector(".bp");if(n&&!p.value)p.value=randPw();});updBulk();break;
+    case "bulk-save":saveBulk(t);break;
+    case "bulk-copy":{const txt=bulkText("\t");(navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast("คัดลอกแล้ว วางใน Excel ได้เลย")).catch(()=>toast("คัดลอกไม่สำเร็จ ใช้ปุ่มดาวน์โหลดแทน"));break;}
+    case "bulk-csv":saveBlob({filename:`รายชื่อผู้ใช้ ${S.cfg.name}.csv`,data:new Blob(["\ufeff"+bulkText(",")],{type:"text/csv"})});break;
+    case "guide-go":{const el=document.getElementById(v);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});break;}
     case "pv-print":pvPrint();break;
     case "pv-close":closePreview();break;
     case "logo-remove":removeLogo();break;
     case "pv-pdf":pvPdf(t);break;
     case "pv-png":pvPng(t);break;
     case "pv-png1":pvPng1(+v,t);break;
-    case "viewas-apply":{const r=checked("va")[0]||S.realRole;S.viewAs=r===S.realRole?null:r;MR.innerHTML="";toast(S.viewAs?`กำลังดูในมุมมอง${ROLE_LABEL[r]}`:"กลับสู่บทบาทจริงแล้ว");render();break;}
     case "print":openPreview(v);break;
     case "close":closeModal();break;
     case "cf-yes":if(MR._res){const r=MR._res;MR._res=null;r(true);}break;
@@ -818,16 +879,26 @@ document.addEventListener("change",ev=>{const tg=ev.target;const k=tg.dataset.ch
   else if(g==="htype"){prefs.hTypes=group;savePrefs();render();}
   else if(g==="urole"){prefs.uRoles=group;savePrefs();render();}
   else if(g==="pD")updSum();
+  else if(g==="bRoles")updBulk();
+  else if(g==="myRole"){setActiveRole(group[0]);MR.innerHTML="";toast(`ใช้งานในบทบาท${ROLE_LABEL[group[0]]}`);render();}
 });
 document.addEventListener("input",ev=>{const tg=ev.target;
   if(tg.closest&&tg.closest("#setupWrap"))S.setupDirty=true;
   if(tg.classList&&tg.classList.contains("pn"))updSum();
+  if(tg.closest&&tg.closest(".brow"))updBulk();
   const k=tg.dataset&&tg.dataset.input;if(!k)return;clearTimeout(S._st);const v=tg.value;
   S._st=setTimeout(()=>{if(k==="h-search")S.hSearch=v;else if(k==="u-search")S.uSearch=v;else S.pSearch=v;const pos=tg.selectionStart;render();const el=document.getElementById(k==="h-search"?"hSearch":k==="u-search"?"uSearch":"pSearch");if(el){el.focus();try{el.setSelectionRange(pos,pos);}catch(e){}}},200);});
-document.addEventListener("paste",ev=>{const tg=ev.target;if(!tg.classList||!tg.classList.contains("pn")||!document.getElementById("pSum"))return;
+document.addEventListener("paste",ev=>{const tg=ev.target;
+  if(tg.closest&&tg.closest(".brow")){const txt=(ev.clipboardData||window.clipboardData).getData("text");const lines=txt.replace(/\r/g,"").split("\n").filter(l=>l.trim());
+    if(lines.length<2&&!txt.includes("\t"))return;ev.preventDefault();
+    let row=tg.closest(".brow");const start=[...row.children].indexOf(tg)-1;
+    lines.forEach((l,k)=>{if(k>0){if(!row.nextElementSibling)addBrow();row=row.nextElementSibling;}
+      const cells=l.split("\t");const ins=[row.querySelector(".bn"),row.querySelector(".bu"),row.querySelector(".bp")];
+      cells.forEach((c,ci)=>{const t2=ins[start+ci];if(t2)t2.value=c.trim();});});numberBrows();return;}if(!tg.classList||!tg.classList.contains("pn")||!document.getElementById("pSum"))return;
   const txt=(ev.clipboardData||window.clipboardData).getData("text");const lines=txt.split(/\r?\n/).map(s=>s.replace(/^\s*[-•*\d.)]+\s*/,"").trim()).filter(Boolean);if(lines.length<2)return;
   ev.preventDefault();tg.value=(tg.value?tg.value+" ":"")+lines[0];let after=tg.closest(".prow");for(const l of lines.slice(1)){addRow("",l,after);after=after.nextElementSibling;}updSum();});
 document.addEventListener("keydown",ev=>{
+  if(ev.key==="Enter"&&ev.target.closest&&ev.target.closest(".brow")){ev.preventDefault();const row=ev.target.closest(".brow");if(!row.nextElementSibling)addBrow();row.nextElementSibling.querySelector(".bn").focus();return;}
   if(ev.key==="Enter"&&ev.target.classList&&ev.target.classList.contains("pn")&&document.getElementById("pSum")){ev.preventDefault();const row=ev.target.closest(".prow");addRow("","",row);row.nextElementSibling.querySelector(".pn").focus();return;}
   if(ev.key==="Escape"){if(pk)closePicker();else if(MR.innerHTML)closeModal();else if(document.getElementById("pvRoot").innerHTML)closePreview();}});
 document.addEventListener("submit",ev=>{const id=ev.target.id;if(id==="loginForm"){ev.preventDefault();doLogin();return;}if(id==="setupFirst"){ev.preventDefault();doSetup();return;}if(!["schoolForm","termForm","sysForm"].includes(id))return;ev.preventDefault();if(id==="schoolForm")saveSchool();else if(id==="termForm")saveTerms();else saveSys();});
@@ -851,10 +922,10 @@ async function handleAuth(u){
 async function handleAuthInner(u){
   if(u&&signedIn&&S.uid===u.uid)return;
   unsubAll();S.loaded.h=false;S.loaded.p=false;S.holidays=[];S.plans=[];S.audit=[];S.users=[];
-  if(!u){S.uid=null;S.me=null;S.myUser=null;S.realRole="teacher";signedIn=false;S.authChecked=true;renderGate();render();return;}
+  if(!u){S.uid=null;S.me=null;S.myUser=null;S.realRole="teacher";S.myRoles=["teacher"];S.activeRole=null;signedIn=false;S.authChecked=true;renderGate();render();return;}
   try{const s=await withTimeout(getDoc(doc(fs,"users",u.uid)),15000);
     if(!s.exists()||s.data().active===false){S.loginErr=!s.exists()?`บัญชีนี้ยังไม่ได้ลงทะเบียนในระบบ (ไม่พบข้อมูลผู้ใช้ ${u.uid.slice(0,8)}…) ติดต่อแอดมินหลัก`:"บัญชีนี้ถูกปิดการใช้งาน ติดต่อแอดมินหลัก";lgStat("");await signOut(auth);return;}
-    const d=s.data();S.uid=u.uid;S.myUser=d;S.me={name:d.displayName||d.username};S.realRole=d.role||"teacher";
+    const d=s.data();S.uid=u.uid;S.myUser=d;S.me={name:d.displayName||d.username};applyRoles(d);
   }catch(e){console.error("[account]",e);S.loginErr=e&&e.code==="timeout"?"โหลดข้อมูลบัญชีไม่สำเร็จ (หมดเวลา) ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่":`ตรวจสอบบัญชีไม่สำเร็จ (${(e&&e.code)||"unknown"})`;lgStat("");await signOut(auth);return;}
   signedIn=true;S.authChecked=true;S.loginErr="";S.gateMode="";
   updateDoc(doc(fs,"users",u.uid),{lastLogin:new Date().toISOString()}).catch(()=>{});
@@ -862,7 +933,7 @@ async function handleAuthInner(u){
   subs.push(DB.collection("plans").onSnapshot(s=>{S.plans=s.docs.map(d=>({id:d.id,...d.data()}));done("p");},()=>done("p")));
   subs.push(DB.collection("audit").orderBy("at","desc").limit(200).onSnapshot(s=>{S.audit=s.docs.map(d=>({id:d.id,...d.data()}));if(S.route==="people")render();},()=>{}));
   subs.push(DB.collection("users").onSnapshot(s=>{S.users=s.docs.map(d=>({id:d.id,...d.data()}));const me=S.users.find(x=>x.id===S.uid);
-    if(me){if(me.active===false){S.loginErr="บัญชีนี้ถูกปิดการใช้งาน ติดต่อแอดมินหลัก";signOut(auth);return;}S.realRole=me.role;S.myUser=me;S.me={name:me.displayName||me.username};}
+    if(me){if(me.active===false){S.loginErr="บัญชีนี้ถูกปิดการใช้งาน ติดต่อแอดมินหลัก";signOut(auth);return;}const keep=S.activeRole;applyRoles(me);if(keep&&S.myRoles.includes(keep))S.activeRole=keep===S.realRole?null:keep;S.myUser=me;S.me={name:me.displayName||me.username};}
     else if(S.uid){S.loginErr="บัญชีนี้ถูกลบออกจากระบบแล้ว";signOut(auth);return;}
     renderNav();if(S.route==="people")render();},()=>{}));
   renderGate();render();toast(`ยินดีต้อนรับ ${S.me.name}`);

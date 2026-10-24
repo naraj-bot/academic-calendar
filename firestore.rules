@@ -8,9 +8,11 @@ service cloud.firestore {
     function signedIn() { return request.auth != null; }
     function userDoc() { return /databases/$(database)/documents/users/$(request.auth.uid); }
     function active() { return signedIn() && exists(userDoc()) && get(userDoc()).data.active == true; }
-    function role() { return get(userDoc()).data.role; }
-    function isMain() { return active() && role() == 'main'; }
-    function isEditor() { return active() && (role() == 'main' || role() == 'school'); }
+    // ผู้ใช้หนึ่งคนมีได้หลายบทบาท (roles) · บัญชีรุ่นแรกที่มีแค่ role ยังใช้ได้
+    function userData() { return get(userDoc()).data; }
+    function myRoles() { return userData().get('roles', [userData().role]); }
+    function isMain() { return active() && myRoles().hasAny(['main']); }
+    function isEditor() { return active() && myRoles().hasAny(['main', 'school']); }
 
     // ตั้งค่าครั้งแรก: อนุญาตเฉพาะตอนที่ยังไม่มีแอดมินหลัก และต้องสร้างเอกสาร bootstrap ในชุดเดียวกัน
     function bootstrapPath() { return /databases/$(database)/documents/config/bootstrap; }
@@ -42,7 +44,7 @@ service cloud.firestore {
         || (bootstrapping() && request.auth.uid == uid && request.resource.data.role == 'main');
       // แอดมินหลักแก้ได้ทุกคน (แต่เปลี่ยนบทบาท/ปิดบัญชีตัวเองไม่ได้) · ผู้ใช้ทั่วไปแก้ได้เฉพาะเวลาเข้าใช้ล่าสุดของตัวเอง
       allow update: if (isMain() && (uid != request.auth.uid
-                          || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'active'])))
+                          || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'roles', 'active'])))
         || (active() && uid == request.auth.uid
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastLogin', 'displayName']));
       allow delete: if isMain() && uid != request.auth.uid;
